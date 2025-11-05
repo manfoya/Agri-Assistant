@@ -1,0 +1,41 @@
+5.1. Risques liés aux Données (Risque Élevé)
+
+C'est le risque le plus critique pour un projet d'IA.
+
+Le Défi : La qualité de la recommandation dépend entièrement de la qualité des données d'entraînement. Or, les données agronomiques pour le Bénin peuvent être rares, incomplètes, non numérisées ou de précision variable. Un modèle entraîné sur des données erronées donnera des conseils dangereux.
+
+Solutions Envisagées :
+
+Prioriser les sources fiables : Commencer avec des sources mondiales validées scientifiquement (SoilGrids, CHIRPS) comme base de notre modèle.
+
+Validation croisée : Utiliser les rapports du MAEP et de l'INRAB non pas comme source primaire, mais comme un moyen de valider ou d'ajuster les prédictions du modèle pour des régions spécifiques.
+
+Transparence : Afficher un "indice de confiance" avec chaque recommandation. Si le modèle est peu sûr de lui pour une zone donnée, il est crucial de le communiquer à l'utilisateur.
+
+Approche Itérative : Reconnaître que la V1 du modèle ne sera pas parfaite. Le but du MVP est aussi de collecter des retours du terrain pour identifier les zones où les données sont mauvaises et doivent être améliorées.
+
+5.2. Risques Techniques (Risque Moyen)
+
+Le Défi : L'utilisation exclusive de plans gratuits ("free tier") impose des contraintes. Les serveurs peuvent se mettre en "veille" (causant une lenteur au premier démarrage), et il peut y avoir des limites sur le nombre d'appels API ou le temps de calcul.
+
+Solutions Envisagées :
+
+Acceptation du compromis : Le temps de réponse de la première requête (quelques secondes) est un compromis acceptable pour un coût d'hébergement de 0 €.
+
+Architecture simple : L'architecture a été pensée pour être la plus simple possible, avec peu de composants, afin de rester dans les limites des plans gratuits.
+
+Optimisation : Mettre en place un système de cache simple pour les requêtes identiques afin de ne pas solliciter le modèle inutilement.
+
+5.3. Risques liés à l'Adoption par les Utilisateurs (Risque Élevé)
+
+Le Défi : La meilleure technologie du monde est inutile si personne ne l'utilise. Les obstacles peuvent être nombreux : manque de confiance dans une "boîte noire" technologique, fracture numérique (accès limité aux smartphones ou à internet), interface peu intuitive.
+
+Solutions Envisagées :
+
+Simplicité Radicale : L'interface utilisateur doit rester extrêmement simple : un seul bouton pour obtenir une réponse claire. Pas de formulaires, pas de jargon.
+
+Implication des Utilisateurs : La "Phase 4 : Test et Validation sur le Terrain" de notre feuille de route est cruciale. Co-créer avec quelques agriculteurs permettra de s'assurer que l'outil répond à un vrai besoin et est facile à utiliser.
+
+PWA pour l'Accessibilité : Le choix d'une Progressive Web App (PWA) élimine la barrière de l'installation via un App Store. Un simple lien partagé via WhatsApp suffit pour accéder à l'application.
+
+Langues Locales : Prévoir dès le début la possibilité de traduire l'interface dans les langues locales principales (Fon, Yoruba, etc.) pour la V2.
