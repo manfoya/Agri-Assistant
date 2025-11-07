@@ -84,13 +84,13 @@ def test_database_integration():
         print(f"Température min/max: {stats[2]}°C / {stats[3]}°C")
         print(f"Humidité moyenne: {stats[4]}%")
         
-        print("\n✅ INTÉGRATION RÉUSSIE !")
+        print("\n INTÉGRATION RÉUSSIE !")
         print("La base de données contient toutes les données nécessaires pour l'IA.")
         
         conn.close()
         
     except Exception as e:
-        print(f"❌ Erreur lors du test: {e}")
+        print(f" Erreur lors du test: {e}")
 
 if __name__ == "__main__":
     test_database_integration()
