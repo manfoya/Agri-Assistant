@@ -1,4 +1,3 @@
-
 ## <u>**Document de Projet :**</u> AgroAssistant
 
 *Une aide à la décision intelligente pour les agriculteurs du Bénin*
@@ -24,7 +23,7 @@
         - Bénéfices clés pour l'agriculteur (réduction du risque, augmentation potentielle du rendement, gain de temps).
         - Objectifs mesurables du projet (ex: développer un MVP fonctionnel, tester avec un groupe de 10 agriculteurs, etc.).
 
-**2. Stratégie de Données : Le Cœur du Réacteur IA**
+**2. Stratégie de Données : Le plus important pour le projet IA**
 
     2.1. Vue d'Ensemble de l'Écosystème de Données
         - Schéma expliquant le flux de données : de la collecte à la recommandation.
@@ -95,9 +94,8 @@
     - Exemples de données collectées.
     - Liens vers les sources de données et les outils 
 
-### Chapitre 5 : 
+### Chapitre 5 :
 
 #### 5.1 : Risque lié aux données
 
 C'est le rique le plus critique pour notre procjet comme pour tout autre projet d'IA
-

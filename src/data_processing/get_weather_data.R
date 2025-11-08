@@ -49,14 +49,37 @@ get_weather_data <- function(lon, lat, start_date, end_date) {
 # On configure les paramètres de la récupération (lat, lon, dates, chemin BDD)
 target_lat <- 7.15
 target_lon <- 2.05
-start_date <- "2023-01-01"
-end_date <- "2023-12-31"  # Test avec 1 an seulement pour simplifier
 db_path <- "data/agridata.sqlite"
 
-# --- 1. EXTRACT : Récupération des données avec notre fonction ---
-cat("Étape 1: Récupération des données météo...\n")
-weather_data <- get_weather_data(target_lon, target_lat, start_date, end_date)
-cat("-> Données récupérées avec succès.\n\n")
+# Années à récupérer (2020-2024 : 5 années complètes)
+years <- 2020:2024
+
+# --- 1. EXTRACT : Récupération des données par année ---
+cat("Étape 1: Récupération des données météo pour", length(years), "années (2020-2024)...\n")
+
+# Initialiser un dataframe vide pour combiner toutes les données
+all_weather_data <- data.frame()
+
+# Boucle pour chaque année
+for(year in years) {
+  start_date <- paste0(year, "-01-01")
+  end_date <- paste0(year, "-12-31")
+  
+  cat("  -> Récupération année", year, ":", start_date, "au", end_date, "\n")
+  
+  # Récupérer les données pour cette année
+  yearly_data <- get_weather_data(target_lon, target_lat, start_date, end_date)
+  
+  # Combiner avec les données précédentes
+  all_weather_data <- rbind(all_weather_data, yearly_data)
+  
+  # Pause entre les requêtes pour éviter de surcharger l'API
+  Sys.sleep(2)
+}
+
+# Assigner les données combinées à weather_data
+weather_data <- all_weather_data
+cat("-> Toutes les données récupérées avec succès (", nrow(weather_data), "jours).\n\n")
 
 # --- DEBUG : Examiner la structure des données ---
 cat("DEBUG: Structure des données reçues:\n")
