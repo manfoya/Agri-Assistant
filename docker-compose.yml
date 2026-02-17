@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  api:
+    build: .
+    container_name: agri_assistant_api
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data:/app/data  # Persister la base de données SQLite
+      - ./r_modules:/app/r_modules # Pour le développement R
+    environment:
+      - DATABASE_URL=sqlite:///./data/agridata.sqlite
+    restart: unless-stopped
