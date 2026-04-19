@@ -31,6 +31,7 @@ class RecommendationLog(Base):
 
     # Contexte
     soil_type = Column(Text, doc="Type de sol detecte via SoilGrids")
+    ph = Column(Float, doc="pH du sol (0-14)")
 
     def __repr__(self) -> str:
         return f"<RecommendationLog id={self.id} crop_1={self.crop_1}>"

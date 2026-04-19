@@ -120,6 +120,7 @@ def recommend_crops(
             latitude=request.latitude,
             longitude=request.longitude,
             soil_type=soil_type,
+            ph=soil_data.get("ph", 6.0),
             crop_1=recommendations[0].crop if len(recommendations) > 0 else None,
             confidence_1=recommendations[0].confidence if len(recommendations) > 0 else None,
             crop_2=recommendations[1].crop if len(recommendations) > 1 else None,
