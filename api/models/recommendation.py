@@ -29,9 +29,8 @@ class RecommendationLog(Base):
     crop_3 = Column(Text, doc="Culture recommandee numero 3")
     confidence_3 = Column(Float, doc="Confiance pour la culture 3")
 
-    # Contexte geographique
-    nearest_zone = Column(Text, doc="Zone agro-ecologique la plus proche")
-    climate_type = Column(Text, doc="Type de climat de la zone")
+    # Contexte
+    soil_type = Column(Text, doc="Type de sol detecte via SoilGrids")
 
     def __repr__(self) -> str:
         return f"<RecommendationLog id={self.id} crop_1={self.crop_1}>"

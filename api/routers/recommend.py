@@ -14,6 +14,7 @@ from api.services.soil_service import soil_service
 from api.services.weather_service import weather_service
 from api.services.matching_service import run_matching
 
+from api.models.recommendation import RecommendationLog
 from api.schemas.recommendation import (
     RecommendationRequest,
     RecommendationResponse,
@@ -112,6 +113,27 @@ def recommend_crops(
 
     # Etape 4 : L'algorithme fait le matching
     recommendations = run_matching(soil_data, climate_data, all_crops)
+
+    # Sauvegarde anonyme dans les logs
+    if recommendations:
+        log_entry = RecommendationLog(
+            latitude=request.latitude,
+            longitude=request.longitude,
+            soil_type=soil_type,
+            crop_1=recommendations[0].crop if len(recommendations) > 0 else None,
+            confidence_1=recommendations[0].confidence if len(recommendations) > 0 else None,
+            crop_2=recommendations[1].crop if len(recommendations) > 1 else None,
+            confidence_2=recommendations[1].confidence if len(recommendations) > 1 else None,
+            crop_3=recommendations[2].crop if len(recommendations) > 2 else None,
+            confidence_3=recommendations[2].confidence if len(recommendations) > 2 else None,
+        )
+        try:
+            db.add(log_entry)
+            db.commit()
+        except Exception as e:
+            # Ne pas bloquer l'utilisateur si le log echoue
+            db.rollback()
+            print(f"Erreur lors du log de la recommandation : {e}")
 
     return RecommendationResponse(
         location=LocationInfo(
