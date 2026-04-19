@@ -23,8 +23,7 @@ class Settings(BaseSettings):
     # -- API NASA POWER (donnees meteo) --
     NASA_POWER_API_URL: str = "https://power.larc.nasa.gov/api/temporal/daily/point"
 
-    class Config:
-        case_sensitive = True
+    model_config = {"case_sensitive": True}
 
 
 settings = Settings()

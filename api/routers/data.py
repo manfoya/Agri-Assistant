@@ -57,8 +57,8 @@ SUPPORTED_CROPS = [
         water_needs_mm="700-1300mm", optimal_temp_c="25-35", cycle_days="150-180",
     ),
     CropInfo(
-        name="Tomate", scientific_name="Solanum lycopersicum", category="Maraichage",
-        water_needs_mm="400-600mm", optimal_temp_c="21-27", cycle_days="60-90",
+        name="Soja", scientific_name="Glycine max", category="Legumineuse",
+        water_needs_mm="450-900mm", optimal_temp_c="20-30", cycle_days="100-130",
     ),
 ]
 
