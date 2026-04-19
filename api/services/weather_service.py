@@ -43,38 +43,50 @@ class WeatherService:
             "format": "JSON"
         }
 
-        try:
-            logger.info(f"Interrogation NASA POWER pour GPS: {latitude}, {longitude}")
-            response = requests.get(self.base_url, params=params, timeout=10)
-            response.raise_for_status()
-            data = response.json()
+        attempt = 0
+        max_retries = 3
+        
+        while attempt < max_retries:
+            attempt += 1
+            try:
+                logger.info(f"Interrogation NASA POWER pour GPS: {latitude}, {longitude} (Essai {attempt}/{max_retries})")
+                response = requests.get(self.base_url, params=params, timeout=10)
+                response.raise_for_status()
+                data = response.json()
 
-            properties = data.get("properties", {}).get("parameter", {})
-            
-            if not properties:
-                logger.error("Format de reponse inattendu de NASA POWER.")
-                return None
+                properties = data.get("properties", {}).get("parameter", {})
+                
+                if not properties:
+                    logger.error("Format de reponse inattendu de NASA POWER.")
+                    return None
 
-            # Les valeurs "ANN" sont les moyennes annuelles.
-            # PRECTOTCORR est en mm/jour. Il faut multiplier par 365 pour le total annuel.
-            avg_daily_precip = properties.get("PRECTOTCORR", {}).get("ANN", 0)
-            annual_rainfall = avg_daily_precip * 365.25
+                # Succes ! On sort de la boucle avec les donnees.
+                break
 
-            return {
-                "latitude": latitude,
-                "longitude": longitude,
-                "temp_mean_c": properties.get("T2M", {}).get("ANN", 25.0),
-                "rainfall_annual_mm": annual_rainfall,
-                "humidity_pct": properties.get("RH2M", {}).get("ANN", 70.0),
-                # On garde aussi les donnees mensuelles pour le calcul du cycle exact de la plante
-                "monthly_temp": properties.get("T2M", {}),
-                "monthly_precip": properties.get("PRECTOTCORR", {}),
-                "monthly_humidity": properties.get("RH2M", {})
-            }
+            except requests.RequestException as error:
+                logger.warning(f"Echec de l'appel NASA POWER (Essai {attempt}/{max_retries}): {error}")
+                if attempt == max_retries:
+                    logger.error("NASA POWER est definitivement inaccessible apres 3 tentatives.")
+                    return None
+                import time
+                time.sleep(1) # Attendre 1 seconde avant de reessayer
 
-        except requests.RequestException as error:
-            logger.error(f"Erreur lors de l'appel NASA POWER : {error}")
-            return None
+        # En dehors de la boucle, si on est la, on a les proprietes
+        # PRECTOTCORR est en mm/jour. Il faut multiplier par 365 pour le total annuel.
+        avg_daily_precip = properties.get("PRECTOTCORR", {}).get("ANN", 0)
+        annual_rainfall = avg_daily_precip * 365.25
+
+        return {
+            "latitude": latitude,
+            "longitude": longitude,
+            "temp_mean_c": properties.get("T2M", {}).get("ANN", 25.0),
+            "rainfall_annual_mm": annual_rainfall,
+            "humidity_pct": properties.get("RH2M", {}).get("ANN", 70.0),
+            # On garde aussi les donnees mensuelles pour le calcul du cycle exact de la plante
+            "monthly_temp": properties.get("T2M", {}),
+            "monthly_precip": properties.get("PRECTOTCORR", {}),
+            "monthly_humidity": properties.get("RH2M", {})
+        }
 
 
 # Instance globale pour etre utilisee dans les routers

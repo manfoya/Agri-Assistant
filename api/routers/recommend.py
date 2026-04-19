@@ -89,7 +89,7 @@ def recommend_crops(
     if not climate_data:
         raise HTTPException(
             status_code=503,
-            detail="Service meteo indisponible pour ce point GPS.",
+            detail="L'API NASA POWER est temporairement inaccessible apres 3 tentatives. Veuillez reessayer plus tard.",
         )
 
     # Etape 3 : Exigences des cultures
