@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Agri-Assistant | Recommandation intelligente</title>
+    <meta name="description" content="Decouvrez les meilleures cultures pour votre sol en un clic.">
+    
+    <!-- Google Fonts pour la typographie Premium -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    
+    <!-- CSS Vanilla -->
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <main class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo-container">
+                <div class="logo-icon">🌿</div>
+                <h1>Agri-Assistant</h1>
+            </div>
+            <p class="subtitle">Analyse instantanee de votre terre</p>
+        </header>
+
+        <!-- Zone d'action centrale -->
+        <section class="action-section" id="action-section">
+            <div class="glass-card main-action-card">
+                <div class="card-icon">📍</div>
+                <h2>Que planter ici ?</h2>
+                <p>Nous utilisons la composition exacte de votre sol et la meteo du mois pour trouver les meilleures cultures.</p>
+                <button id="btn-analyze" class="btn-primary">
+                    <span class="btn-text">Analyser mon sol</span>
+                    <div class="btn-loader" id="btn-loader" style="display: none;"></div>
+                </button>
+            </div>
+        </section>
+
+        <!-- Zone de chargement animée -->
+        <section class="loading-section" id="loading-section" style="display: none;">
+            <div class="radar-animation"></div>
+            <p id="loading-text">Geolocalisation en cours...</p>
+        </section>
+
+        <!-- Zone de resultats -->
+        <section class="results-section" id="results-section" style="display: none;">
+            <!-- Recap du sol -->
+            <div class="soil-recap">
+                <h3>Votre Terrain</h3>
+                <div class="soil-badges">
+                    <span class="badge" id="badge-soil-type">Sol: -</span>
+                    <span class="badge" id="badge-ph">pH: -</span>
+                    <span class="badge" id="badge-fertility">Fertilite: -</span>
+                </div>
+            </div>
+
+            <!-- Titre des recommandations -->
+            <h3 class="recommendations-title">Top 3 Recommandations</h3>
+            
+            <!-- Conteneur des cartes de culture -->
+            <div id="crops-container" class="crops-container">
+                <!-- Les cartes seront injectees ici par JS -->
+            </div>
+            
+            <button id="btn-reset" class="btn-secondary">Nouvelle analyse</button>
+        </section>
+        
+        <!-- Affichage des erreurs -->
+        <div id="error-toast" class="error-toast"></div>
+    </main>
+
+    <!-- JS Vanilla -->
+    <script src="/app.js"></script>
+</body>
+</html>

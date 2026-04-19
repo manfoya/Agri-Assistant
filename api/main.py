@@ -8,6 +8,8 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 
 from api.core.config import settings
 from api.core.database import engine, Base
@@ -62,12 +64,10 @@ app.include_router(recommend.router)
 app.include_router(data.router)
 
 
-@app.get("/", tags=["Accueil"])
-def root():
-    """Page d'accueil de l'API."""
-    return {
-        "message": f"Bienvenue sur {settings.PROJECT_NAME}",
-        "version": settings.VERSION,
-        "docs": "/docs",
-        "health": "/health",
-    }
+@app.get("/", tags=["UI"])
+async def serve_index():
+    """Sert l'application Web PWA au chemin racine."""
+    return FileResponse("static/index.html")
+
+# On monte le reste du dossier static (css, js, images) a la racine
+app.mount("/", StaticFiles(directory="static"), name="static")
