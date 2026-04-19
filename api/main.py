@@ -1,44 +1,73 @@
-from fastapi import FastAPI, Depends, HTTPException
-from pydantic import BaseModel
-from typing import Dict, Any
+"""Point d'entree de l'API Agri-Assistant.
+
+Lance le serveur FastAPI, enregistre les routers,
+et cree les tables manquantes dans la BDD au demarrage.
+"""
+
+from contextlib import asynccontextmanager
+
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from api.core.config import settings
-from api.services.soil_service import soil_service
+from api.core.database import engine, Base
 
-app = FastAPI(title=settings.PROJECT_NAME, openapi_url=f"{settings.API_V1_STR}/openapi.json")
+# On importe les modeles pour que SQLAlchemy les connaisse
+# et puisse creer les tables au demarrage.
+from api.models import SoilData, WeatherData, RecommendationLog  # noqa: F401
 
-class CropRecommendationRequest(BaseModel):
-    latitude: float
-    longitude: float
+# Routers
+from api.routers import health, recommend, data
 
-class CropRecommendationResponse(BaseModel):
-    crop: str
-    confidence: float
-    soil_data: Dict[str, Any]
 
-@app.get("/")
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Actions au demarrage et a l'arret du serveur."""
+
+    # Demarrage : creer les tables si elles n'existent pas.
+    # Les tables existantes (weather_data, soil_data) ne seront pas ecrasees.
+    Base.metadata.create_all(bind=engine)
+    print(f"[Agri-Assistant v{settings.VERSION}] API demarree.")
+    yield
+    # Arret
+    print(f"[Agri-Assistant] API arretee.")
+
+
+app = FastAPI(
+    title=settings.PROJECT_NAME,
+    description=(
+        "Systeme intelligent de recommandation de cultures "
+        "et de prediction de fenetres de semis pour le Benin. "
+        "Utilise les donnees de sol (SoilGrids), meteo (NASA POWER) "
+        "et un modele de Machine Learning."
+    ),
+    version=settings.VERSION,
+    openapi_url=f"{settings.API_V1_STR}/openapi.json",
+    lifespan=lifespan,
+)
+
+# -- CORS : autorise toutes les origines pour le developpement.
+# A restreindre en production.
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# -- Enregistrement des routers --
+app.include_router(health.router)
+app.include_router(recommend.router)
+app.include_router(data.router)
+
+
+@app.get("/", tags=["Accueil"])
 def root():
-    return {"message": "Welcome to Agri-Assistant API"}
-
-@app.post("/recommend", response_model=CropRecommendationResponse)
-def recommend(request: CropRecommendationRequest):
-    """
-    Endpoint to get crop recommendations based on location.
-    Fetches real soil data from SoilGrids (or fallback).
-    """
-    # 1. Get Soil Data
-    soil_data = soil_service.get_soil_data(request.latitude, request.longitude)
-    
-    if not soil_data:
-        raise HTTPException(status_code=404, detail="Could not fetch soil data for this location")
-
-    # 2. Predict (Placeholder for ML Model)
-    # TODO: Load trained model and predict based on soil_data + weather history
-    prediction = "Maize" 
-    confidence = 0.85
-
+    """Page d'accueil de l'API."""
     return {
-        "crop": prediction,
-        "confidence": confidence,
-        "soil_data": soil_data
+        "message": f"Bienvenue sur {settings.PROJECT_NAME}",
+        "version": settings.VERSION,
+        "docs": "/docs",
+        "health": "/health",
     }
