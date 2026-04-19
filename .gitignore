@@ -43,3 +43,10 @@ data/raw/*.csv
 *.parquet
 *.feather
 donnees-brute/
+# Training data (downloaded from Kaggle, not tracked)
+data/training/
+# SQLite database (generated, not source code)
+data/*.sqlite
+# ML saved models
+ml/models/*.joblib
+ml/models/*.pkl
