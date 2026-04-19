@@ -6,6 +6,10 @@
     <title>Agri-Assistant | Recommandation intelligente</title>
     <meta name="description" content="Decouvrez les meilleures cultures pour votre sol en un clic.">
     
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#10b981">
+    
     <!-- Google Fonts pour la typographie Premium -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -73,5 +77,16 @@
 
     <!-- JS Vanilla -->
     <script src="/app.js"></script>
+    
+    <!-- Enregistrement du Service Worker pour la PWA -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then(registration => console.log('ServiceWorker installe avec succes.'))
+            .catch(error => console.log('Erreur d\'installation du ServiceWorker:', error));
+        });
+      }
+    </script>
 </body>
 </html>
