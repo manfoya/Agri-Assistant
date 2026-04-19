@@ -66,9 +66,10 @@ class WeatherService:
                 "temp_mean_c": properties.get("T2M", {}).get("ANN", 25.0),
                 "rainfall_annual_mm": annual_rainfall,
                 "humidity_pct": properties.get("RH2M", {}).get("ANN", 70.0),
-                # On garde aussi les donnees mensuelles pour d'eventuels calculs futurs
+                # On garde aussi les donnees mensuelles pour le calcul du cycle exact de la plante
                 "monthly_temp": properties.get("T2M", {}),
-                "monthly_precip": properties.get("PRECTOTCORR", {})
+                "monthly_precip": properties.get("PRECTOTCORR", {}),
+                "monthly_humidity": properties.get("RH2M", {})
             }
 
         except requests.RequestException as error:
