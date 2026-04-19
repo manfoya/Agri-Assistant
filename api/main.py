@@ -48,13 +48,19 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# -- CORS : autorise toutes les origines pour le developpement.
-# A restreindre en production.
+# -- CORS : configuration securisee pour la production.
+origins = [
+    "http://localhost",
+    "http://localhost:8000",
+    "http://127.0.0.1:8000",
+    "https://agri-assistant.com", # Exemple de domaine de prod
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=origins,
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["*"],
 )
 

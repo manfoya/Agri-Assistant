@@ -81,7 +81,11 @@ def get_admin_dashboard(db: Session = Depends(get_db)):
             acidity = get_acidity_label(avg_ph)
             soil_insight = f"🧪 La majorite des sols analyses dans la region <strong>{top_region}</strong> sont <strong>{acidity}</strong> (pH moyen: {avg_ph:.1f})."
 
-    # Generer le HTML (design minimaliste mais riche en info)
+    # Preparer les donnees pour Chart.js
+    chart_labels = list(crop_counts.keys()) if 'crop_counts' in locals() and crop_counts else []
+    chart_data = list(crop_counts.values()) if 'crop_counts' in locals() and crop_counts else []
+
+    # Generer le HTML (design minimaliste mais riche en info + Graphique)
     html_content = f"""
     <!DOCTYPE html>
     <html lang="fr">
@@ -90,6 +94,8 @@ def get_admin_dashboard(db: Session = Depends(get_db)):
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Dashboard Admin | Agri-Assistant</title>
         <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+        <!-- Importation de Chart.js -->
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <style>
             body {{ font-family: 'Outfit', sans-serif; background-color: #0f172a; color: #f8fafc; margin: 0; padding: 40px; }}
             .container {{ max-width: 900px; margin: 0 auto; }}
@@ -99,6 +105,7 @@ def get_admin_dashboard(db: Session = Depends(get_db)):
             .insight-box:last-child {{ margin-bottom: 0; }}
             .stat-header {{ display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }}
             .total-badge {{ background: #10b981; color: white; padding: 8px 16px; border-radius: 20px; font-weight: bold; font-size: 20px; }}
+            .chart-container {{ margin-top: 40px; background: #1e293b; padding: 20px; border-radius: 16px; height: 350px; display: flex; justify-content: center; }}
         </style>
     </head>
     <body>
@@ -123,11 +130,46 @@ def get_admin_dashboard(db: Session = Depends(get_db)):
                     {soil_insight}
                 </div>
             </div>
+
+            <!-- Conteneur du Graphique -->
+            <div class="chart-container">
+                <canvas id="cropChart"></canvas>
+            </div>
             
             <div style="margin-top: 50px; color: #64748b; font-size: 14px; text-align: center;">
-                Generateur d'Insights en Langage Naturel • Agri-Assistant 2026
+                Generateur d'Insights en Langage Naturel & Visualisation • Agri-Assistant 2026
             </div>
         </div>
+
+        <script>
+            const ctx = document.getElementById('cropChart').getContext('2d');
+            const cropChart = new Chart(ctx, {{
+                type: 'doughnut',
+                data: {{
+                    labels: {chart_labels},
+                    datasets: [{{
+                        label: 'Nombre de Recommandations',
+                        data: {chart_data},
+                        backgroundColor: [
+                            'rgba(16, 185, 129, 0.8)',
+                            'rgba(59, 130, 246, 0.8)',
+                            'rgba(245, 158, 11, 0.8)',
+                            'rgba(239, 68, 68, 0.8)',
+                            'rgba(139, 92, 246, 0.8)'
+                        ],
+                        borderWidth: 0
+                    }}]
+                }},
+                options: {{
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {{
+                        legend: {{ position: 'right', labels: {{ color: '#f8fafc', font: {{ family: 'Outfit', size: 14 }} }} }},
+                        title: {{ display: true, text: 'Top Cultures Recommandees ce mois-ci', color: '#10b981', font: {{ family: 'Outfit', size: 18, weight: 'bold' }} }}
+                    }}
+                }}
+            }});
+        </script>
     </body>
     </html>
     """
