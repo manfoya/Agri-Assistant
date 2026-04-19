@@ -28,12 +28,19 @@ def test_evaluate_crop_maize():
         temp_min=10.0, temp_max=40.0, temp_ideal_min=25.0, temp_ideal_max=30.0,
         rainfall_min_mm=500.0, rainfall_max_mm=1200.0,
         rainfall_ideal_min_mm=600.0, rainfall_ideal_max_mm=900.0,
-        humidity_min=50.0, humidity_max=85.0
+        humidity_min=50.0, humidity_max=85.0,
+        cycle_days_min=120
     )
     
     # Conditions parfaites
     perfect_soil = {"ph": 6.5, "nitrogen": 2.5, "sand": 50, "clay": 20, "soc": 25, "cec": 20}
-    perfect_climate = {"temp_mean_c": 28.0, "rainfall_annual_mm": 800.0, "humidity_pct": 70.0}
+    perfect_climate = {
+        "temp_mean_c": 28.0, "rainfall_annual_mm": 800.0, "humidity_pct": 70.0,
+        "monthly_temp": {m: 28.0 for m in ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"]},
+        # Pour le Mais (env 4 mois), on veut au moins 600mm, donc env 150mm par mois = 5mm par jour
+        "monthly_precip": {m: 5.0 for m in ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"]},
+        "monthly_humidity": {m: 70.0 for m in ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"]}
+    }
     
     score_perfect, reasons = evaluate_crop(maize, perfect_soil, perfect_climate)
     assert score_perfect == 100.0
@@ -41,7 +48,12 @@ def test_evaluate_crop_maize():
     
     # Conditions arides (trop sec, ph extreme)
     arid_soil = {"ph": 4.5, "nitrogen": 0.5, "sand": 90, "clay": 5, "soc": 5, "cec": 5}
-    arid_climate = {"temp_mean_c": 42.0, "rainfall_annual_mm": 300.0, "humidity_pct": 20.0}
+    arid_climate = {
+        "temp_mean_c": 42.0, "rainfall_annual_mm": 300.0, "humidity_pct": 20.0,
+        "monthly_temp": {m: 42.0 for m in ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"]},
+        "monthly_precip": {m: 0.5 for m in ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"]},
+        "monthly_humidity": {m: 20.0 for m in ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"]}
+    }
     
     score_arid, reasons_arid = evaluate_crop(maize, arid_soil, arid_climate)
     assert score_arid < 30.0 # Score tres bas attendu

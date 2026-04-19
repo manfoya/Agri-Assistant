@@ -7,6 +7,7 @@ de compatibilite (0 a 100%) pour chaque culture de notre base.
 
 from typing import Dict, Any, List
 from datetime import datetime
+import math
 
 from api.models.crop_requirement import CropRequirement
 from api.schemas.recommendation import CropRecommendation, SowingWindow
@@ -46,28 +47,60 @@ def calculate_partial_score(value: float, min_val: float, max_val: float, ideal_
         
     return 0.0
 
-def evaluate_crop(crop: CropRequirement, soil_data: Dict[str, Any], climate_data: Dict[str, Any]) -> tuple[float, List[str]]:
-    """Evalue a quel point un environnement correspond a une culture.
+MONTHS = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"]
+
+def get_current_month_climate(climate_data: Dict[str, Any]) -> tuple[float, float, float]:
+    """Recupere la meteo (pluie totale, temp moyenne, humidite) UNIQUEMENT pour le mois en cours."""
     
-    Retourne le score final (0 a 100) et la liste des points forts/faibles.
-    """
+    monthly_precip = climate_data.get("monthly_precip", {})
+    monthly_temp = climate_data.get("monthly_temp", {})
+    monthly_humidity = climate_data.get("monthly_humidity", {})
+    
+    # Si pas de donnees mensuelles, on se rabat sur la moyenne annuelle (divisee par 12 pour la pluie)
+    if not monthly_precip or not monthly_temp:
+        return climate_data.get("rainfall_annual_mm", 0) / 12, climate_data.get("temp_mean_c", 25.0), climate_data.get("humidity_pct", 70.0)
+    
+    current_month_index = datetime.now().month - 1 # 0 a 11
+    month_key = MONTHS[current_month_index]
+    
+    # Pluie du mois : mm/jour * 30 jours
+    rain_per_day = monthly_precip.get(month_key, 0)
+    current_month_rain = rain_per_day * 30.0
+    
+    current_month_temp = monthly_temp.get(month_key, 25.0)
+    current_month_hum = monthly_humidity.get(month_key, 70.0)
+    
+    return current_month_rain, current_month_temp, current_month_hum
+
+def evaluate_crop(crop: CropRequirement, soil_data: Dict[str, Any], climate_data: Dict[str, Any]) -> tuple[float, List[str]]:
+    """Evalue l'adequation A L'INSTANT T (mois en cours)."""
     reasons = []
+    
+    # Météo du mois en cours uniquement
+    current_rain, current_temp, current_hum = get_current_month_climate(climate_data)
+    
+    # Conversion des besoins de la plante (qui sont sur tout son cycle) en besoins MENSUELS
+    months_in_cycle = max(1, crop.cycle_days_min / 30.0)
+    monthly_rain_min = crop.rainfall_min_mm / months_in_cycle
+    monthly_rain_max = crop.rainfall_max_mm / months_in_cycle
+    monthly_rain_ideal_min = crop.rainfall_ideal_min_mm / months_in_cycle
+    monthly_rain_ideal_max = crop.rainfall_ideal_max_mm / months_in_cycle
     
     # 1. Eau (Pluie + Humidite)
     rainfall_score = calculate_partial_score(
-        climate_data["rainfall_annual_mm"],
-        crop.rainfall_min_mm, crop.rainfall_max_mm,
-        crop.rainfall_ideal_min_mm, crop.rainfall_ideal_max_mm
+        current_rain,
+        monthly_rain_min, monthly_rain_max,
+        monthly_rain_ideal_min, monthly_rain_ideal_max
     )
     humidity_score = calculate_partial_score(
-        climate_data["humidity_pct"],
+        current_hum,
         crop.humidity_min, crop.humidity_max,
         crop.humidity_min + 10, crop.humidity_max - 10  # Ideals approximatifs
     )
     
     # 2. Climat (Temperature)
     temp_score = calculate_partial_score(
-        climate_data["temp_mean_c"],
+        current_temp,
         crop.temp_min, crop.temp_max,
         crop.temp_ideal_min, crop.temp_ideal_max
     )
