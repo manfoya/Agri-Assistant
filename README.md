@@ -2,9 +2,9 @@
 
 Agri-Assistant est un système intelligent de **recommandation de cultures** et d'évaluation agronomique, conçu pour les agriculteurs du Bénin. 
 
-Il utilise une approche d'**Évaluation Multicritères (MCE)** instantanée : au lieu de se fier uniquement à des données historiques biaisées, le système croise les **coordonnées GPS exactes** (climatologie NASA POWER et composition du sol via SoilGrids) avec les exigences biologiques parfaites de 10 cultures cibles pour recommander celle qui produira le rendement maximal *à l'instant T*.
+Il analyse plusieurs conditions en même temps et en un clin d'œil : au lieu de se fier uniquement à des données historiques biaisées, le système croise les **coordonnées GPS exactes** (climatologie NASA POWER et composition du sol via SoilGrids) avec les exigences biologiques de 10 cultures cibles pour recommander celle qui produira le rendement maximal *à l'instant T*.
 
-## ✨ Fonctionnalités Principales
+## Fonctionnalités Principales
 
 - **Recommandation Instantanée par GPS** : L'algorithme calcule le score de compatibilité (0-100%) d'une culture en se basant uniquement sur la météo du mois en cours et la texture du sol.
 - **Backend Rapide et Robuste** : Développé en Python avec **FastAPI**, incluant une base de données SQLite embarquée (`crop_requirements` et historique météo).
@@ -12,14 +12,14 @@ Il utilise une approche d'**Évaluation Multicritères (MCE)** instantanée : au
 - **Logs Anonymes** : Un système de suivi des recherches (`recommendation_log`) pour analyser l'utilisation sans collecter de données privées.
 - **Scripts R de Data Science** : Le projet inclut des scripts R dédiés (`nasapower`) pour les calculs climatiques complexes (fenêtres de semis).
 
-## 🛠️ Stack Technique
+## Stack Technique
 
 - **Backend** : Python 3.11, FastAPI, SQLAlchemy, Pydantic, Scikit-learn.
 - **Frontend** : Vanilla HTML5, CSS3, JavaScript ES6 (Progressive Web App).
 - **Data Science** : R, package `nasapower`.
 - **Base de données** : SQLite.
 
-## 🚀 Installation Locale (Développement)
+## Installation Locale (Développement)
 
 1. **Cloner le dépôt**
    ```bash
