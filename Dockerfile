@@ -1,32 +1,37 @@
-# Utiliser une image Python légère
-FROM python:3.10-slim
+# Utiliser l'image de base officielle Python 3.11
+FROM python:3.11-slim
 
-# Installer R et les dépendances système nécessaires
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    r-base \
-    build-essential \
-    libsqlite3-dev \
-    && rm -rf /var/lib/apt/lists/*
+# Metadonnees
+LABEL maintainer="Agri-Assistant Team"
+LABEL description="Backend FastAPI et scripts d'Agri-Assistant"
 
-# Définir le répertoire de travail
+# Definir le repertoire de travail
 WORKDIR /app
 
-# Copier les fichiers de dépendances Python
+# Installer R et les dependances systeme requises
+RUN apt-get update && apt-get install -y \
+    r-base \
+    r-base-dev \
+    libcurl4-openssl-dev \
+    libssl-dev \
+    libxml2-dev \
+    gcc \
+    && rm -rf /var/lib/apt/lists/*
+
+# Installer les packages R requis (nasapower, dplyr, etc.)
+RUN R -e "install.packages(c('nasapower', 'dplyr', 'lubridate'), repos='https://cloud.r-project.org/')"
+
+# Copier les fichiers de dependances Python
 COPY requirements.txt .
 
-# Installer les dépendances Python
+# Installer les dependances Python
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Installer les packages R via renv (si renv.lock existe)
-# Pour l'instant, on installe juste les bases si nécessaire
-# COPY r_modules/renv.lock r_modules/
-# RUN Rscript -e "install.packages('renv'); renv::restore(project='r_modules')"
-
-# Copier tout le code du projet
+# Copier tout le code de l'application
 COPY . .
 
-# Exposer le port pour l'API
+# Exposer le port utilise par FastAPI
 EXPOSE 8000
 
-# Commande de lancement
+# Commande pour demarrer l'application avec Uvicorn
 CMD ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "8000"]
