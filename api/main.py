@@ -19,7 +19,7 @@ from api.core.database import engine, Base
 from api.models import SoilData, WeatherData, RecommendationLog  # noqa: F401
 
 # Routers
-from api.routers import health, recommend, data
+from api.routers import health, recommend, data, admin
 
 
 @asynccontextmanager
@@ -62,6 +62,7 @@ app.add_middleware(
 app.include_router(health.router)
 app.include_router(recommend.router)
 app.include_router(data.router)
+app.include_router(admin.router)
 
 
 @app.get("/", tags=["UI"])
